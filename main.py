@@ -14,7 +14,7 @@ OUTPUT_DIR         = config["OUTPUT_DIR"]
 CHECKPOINT_PATH     = config["CHECKPOINT_PATH"]
 IMAGE_SIZE        = config["IMAGE_SIZE"]
 ALPHA             = config["ALPHA"]
-BETA              = config["BETA"]
+BETA              = float(config['BETA'])
 NUM_STEPS         = config["NUM_STEPS"]
 SAVE_EVERY        = config["SAVE_EVERY"]
 CONTENT_LAYER     = config["CONTENT_LAYER"]
@@ -54,8 +54,8 @@ def main():
         print("  Pretrained weights loaded successfully.")
     else:
         print(f"  WARNING: No checkpoint found at '{CHECKPOINT_PATH}'.")
-        print("  The CNN has RANDOM weights — output quality will be poor.")
-        print("  Run 'python classifier.py' first to train the feature extractor.")
+        print("  Run 'python train.py' first to train the feature extractor.")
+        return
 
     num_params = sum(p.numel() for p in model.parameters())
     print(f"  Total CNN parameters: {num_params:,}")

@@ -14,7 +14,7 @@ with open("configs/default.yaml", "r") as f:
     config = yaml.safe_load(f)
 BATCH_SIZE     = config["BATCH_SIZE"]
 NUM_EPOCHS     = config["NUM_EPOCHS"]
-LEARNING_RATE  = config["LEARNING_RATE"]
+LEARNING_RATE  = float(config["LEARNING_RATE"])
 CHECKPOINT_PATH = config["CHECKPOINT_PATH"]
 
 
@@ -101,7 +101,7 @@ def main():
         optimizer, step_size=8, gamma=0.5
     )
 
-    best_val_acc = 0.0
+    best_val_accuracy = 0.0
     print(f"\nTraining for {NUM_EPOCHS} epochs...")
     print(f"{'Epoch':>6} | {'Train Loss':>10} | {'Train Acc':>9} | {'Val Loss':>8} | {'Val Acc':>7} | {'LR':>8}")
     print("-" * 65)
