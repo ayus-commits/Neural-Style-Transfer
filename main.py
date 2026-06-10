@@ -25,7 +25,7 @@ with open("configs/" + args.config + ".yaml", "r") as f:
     config = yaml.safe_load(f)
 IMAGE_SIZE        = config["IMAGE_SIZE"]
 ALPHA             = config["ALPHA"]
-BETA              = float(config['BETA'])
+BETA              = config['BETA']
 NUM_STEPS         = config["NUM_STEPS"]
 CONTENT_LAYER     = config["CONTENT_LAYER"]
 STYLE_LAYERS      = config["STYLE_LAYERS"]

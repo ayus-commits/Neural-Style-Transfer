@@ -1,15 +1,15 @@
 MEAN : [0.485, 0.456, 0.406]
 STD : [0.229, 0.224, 0.225]
 
-
+#train.py
 BATCH_SIZE : 64
 NUM_EPOCHS : 20
-LEARNING_RATE : 1.0e-3
+LEARNING_RATE : 0.001
 
-
+#main.py
 IMAGE_SIZE     : 512
 ALPHA : 1.0
-BETA  : 1.0e5
+BETA  : 100000.0
 NUM_STEPS  : 30
 CONTENT_LAYER : "stage4"
 STYLE_LAYERS : ["stage1", "stage2", "stage3"]

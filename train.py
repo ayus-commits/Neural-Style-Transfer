@@ -16,16 +16,16 @@ import yaml
 parser = argparse.ArgumentParser(description="Neural Style Transfer")
 # parser.add_argument("--data-dir", help="Path to the STL-10 dataset", default="./data")
 parser.add_argument("--data", help="Dataset to use", required=True)
-parser.add_argument("--config", help="Which config file to use", default="default")
+# parser.add_argument("--config", help="Which config file to use", default="default")
 args = parser.parse_args()
 DATASET = args.data
 
 
-with open("configs/" + args.config + ".yaml", "r") as f:
+with open("configs/default.yaml", "r") as f:
     config = yaml.safe_load(f)
 BATCH_SIZE     = config["BATCH_SIZE"]
 NUM_EPOCHS     = config["NUM_EPOCHS"]
-LEARNING_RATE  = float(config["LEARNING_RATE"])
+LEARNING_RATE  = config["LEARNING_RATE"]
 
 
 def train_one_epoch(model, loader, optimizer, loss_fn, device):

@@ -1,0 +1,7 @@
+#main.py
+IMAGE_SIZE     : 512
+ALPHA : 1.0
+BETA  : 100000000000.0
+NUM_STEPS  : 30
+CONTENT_LAYER : "stage4"
+STYLE_LAYERS : ["stage1", "stage2", "stage3"]
