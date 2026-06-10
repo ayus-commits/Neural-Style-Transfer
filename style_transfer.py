@@ -13,7 +13,6 @@ def run_style_transfer(
     alpha,
     beta,
     num_steps,
-    save_every,
     output_dir,
     device,
     content_layer,
@@ -71,17 +70,15 @@ def run_style_transfer(
     for step in range(1, num_steps + 1):
         optimizer.step(closure)
 
-        # if step % 50 == 0 or step == 1 or step == num_steps:
         print(f"  Step {step:4d}/{num_steps} | "
                 f"Loss: {latest_losses['total']:.4f} | "
                 f"Content: {latest_losses['content']:.4f} | "
                 f"Style: {latest_losses['style']:.6f}")
 
-        # if step % save_every == 0 or step == 1:
         _save_intermediate(generated, output_dir, step)
         save_image(generated, os.path.join(output_dir, "latest.jpg"))
         img_to_show = cv2.imread(os.path.join(output_dir, "latest.jpg"))
-        cv2.imshow("Live AI Output", img_to_show)
+        cv2.imshow("Live Output", img_to_show)
         cv2.waitKey(200)
 
     print("-" * 50)

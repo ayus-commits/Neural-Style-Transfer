@@ -9,19 +9,24 @@ import argparse
 parser = argparse.ArgumentParser(description="Neural Style Transfer")
 parser.add_argument("--content", help="Path to the content image" ,required=True)
 parser.add_argument("--style", help="Path to the style image", required=True)
+parser.add_argument("--name", help="Name for the output image folder", required=True)
+
+parser.add_argument("--config", help="Which config file to use", default="default")
+parser.add_argument("--output-dir", help="Directory to save outputs", default="./outputs")
+parser.add_argument("--checkpoint", help="Checkpoint to use(stl10 or imagenette)", default="imagenette")
 args = parser.parse_args()
 CONTENT_IMAGE_PATH = args.content
 STYLE_IMAGE_PATH   = args.style
+OUTPUT_DIR         = args.output_dir + "/" + args.name
+CHECKPOINT_PATH     = "./checkpoints/" + args.checkpoint + "_backbone.pth"
 
-with open("configs/default.yaml", "r") as f:
+
+with open("configs/" + args.config + ".yaml", "r") as f:
     config = yaml.safe_load(f)
-OUTPUT_DIR         = config["OUTPUT_DIR"]
-CHECKPOINT_PATH     = config["CHECKPOINT_PATH"]
 IMAGE_SIZE        = config["IMAGE_SIZE"]
 ALPHA             = config["ALPHA"]
 BETA              = float(config['BETA'])
 NUM_STEPS         = config["NUM_STEPS"]
-SAVE_EVERY        = config["SAVE_EVERY"]
 CONTENT_LAYER     = config["CONTENT_LAYER"]
 STYLE_LAYERS      = config["STYLE_LAYERS"]
 
@@ -86,7 +91,6 @@ def main():
         alpha          = ALPHA,
         beta           = BETA,
         num_steps      = NUM_STEPS,
-        save_every     = SAVE_EVERY,
         output_dir     = OUTPUT_DIR,
         device         = device,
         content_layer  = CONTENT_LAYER,

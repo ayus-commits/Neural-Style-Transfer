@@ -1,21 +1,31 @@
 #This file train CNN on dataset and saves the model.
 
+import argparse
+
 import torch
 import torch.nn as nn
 import os
 
 from cnn import Classifier
-from dataset import get_dataloaders_stl10
+from dataset import get_dataloaders_imagenette, get_dataloaders_stl10
 from utils import get_device
 
+from tqdm import tqdm
 import yaml
 
-with open("configs/default.yaml", "r") as f:
+parser = argparse.ArgumentParser(description="Neural Style Transfer")
+# parser.add_argument("--data-dir", help="Path to the STL-10 dataset", default="./data")
+parser.add_argument("--data", help="Dataset to use", required=True)
+parser.add_argument("--config", help="Which config file to use", default="default")
+args = parser.parse_args()
+DATASET = args.data
+
+
+with open("configs/" + args.config + ".yaml", "r") as f:
     config = yaml.safe_load(f)
 BATCH_SIZE     = config["BATCH_SIZE"]
 NUM_EPOCHS     = config["NUM_EPOCHS"]
 LEARNING_RATE  = float(config["LEARNING_RATE"])
-CHECKPOINT_PATH = config["CHECKPOINT_PATH"]
 
 
 def train_one_epoch(model, loader, optimizer, loss_fn, device):
@@ -75,20 +85,29 @@ def save_backbone(model, path):
 
 def main():
     print("=" * 60)
-    print("  STEP 1: TRAIN CNN ON STL-10 CLASSIFICATION")
+    print("  STEP 1: TRAIN CNN")
     print("=" * 60)
     print("This trains the feature extractor so its weights are meaningful.")
     print("Run this ONCE. Then run main.py for style transfer.\n")
 
     device = get_device()
     print(f"Using device: {device}\n")
-    print("Loading STL-10 dataset (downloads ~2.5 GB on first run)...")
-    train_loader, val_loader = get_dataloaders_stl10(
-        data_dir    = "./data",
-        batch_size  = BATCH_SIZE,
-        num_workers = 2
-    )
-
+    if DATASET.lower() == "stl10":
+        print("Loading STL-10 dataset (downloads ~2.5 GB on first run)...")
+        train_loader, val_loader = get_dataloaders_stl10(
+            data_dir    = "./data",
+            batch_size  = BATCH_SIZE,
+            num_workers = 2
+        )
+        CHECKPOINT_PATH = "./checkpoints/stl10_backbone.pth"
+    elif DATASET.lower() == "imagenette":
+        print("Loading Imagenette dataset...(1.56 GB on first run)")
+        train_loader, val_loader = get_dataloaders_imagenette(
+            data_dir    = "./data",
+            batch_size  = BATCH_SIZE,
+            num_workers = 2
+        )
+        CHECKPOINT_PATH = "./checkpoints/imagenette_backbone.pth"
     model = Classifier(num_classes=10).to(device)
 
     total_params = sum(p.numel() for p in model.parameters())
