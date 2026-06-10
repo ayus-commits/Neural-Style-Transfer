@@ -10,7 +10,7 @@ with open("configs/default.yaml", "r") as f:
 MEAN = config["MEAN"]
 STD = config["STD"]
 
-train_transform = transforms.Compose([
+train_transform_stl10 = transforms.Compose([
     transforms.RandomCrop(88),
     transforms.Resize(96),
     transforms.RandomHorizontalFlip(p=0.5),
@@ -18,16 +18,15 @@ train_transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(mean=MEAN, std=STD),
 ])
-
-val_transform = transforms.Compose([
+val_transform_stl10 = transforms.Compose([
     transforms.Resize(96),
     transforms.ToTensor(),
     transforms.Normalize(mean=MEAN, std=STD),
 ])
 
-def get_dataloaders(data_dir="./data", batch_size=64, num_workers=2):
-    train_dataset = datasets.STL10(root=data_dir, split="train", download=True, transform=train_transform)
-    val_dataset = datasets.STL10(root=data_dir, split="test", download=True, transform=val_transform)
+def get_dataloaders_stl10(data_dir="./data", batch_size=64, num_workers=2):
+    train_dataset = datasets.STL10(root=data_dir, split="train", download=True, transform=train_transform_stl10)
+    val_dataset = datasets.STL10(root=data_dir, split="test", download=True, transform=val_transform_stl10)
 
     print(f"Training samples:   {len(train_dataset)}")
     print(f"Validation samples: {len(val_dataset)}")
@@ -36,3 +35,16 @@ def get_dataloaders(data_dir="./data", batch_size=64, num_workers=2):
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
     return train_loader, val_loader
+
+
+# def get_dataloaders_coco(data_dir="./data", batch_size=64, num_workers=2):
+#     train_dataset = datasets.STL10(root=data_dir, split="train", download=True, transform=train_transform_stl10)
+#     val_dataset = datasets.STL10(root=data_dir, split="test", download=True, transform=val_transform_stl10)
+
+#     print(f"Training samples:   {len(train_dataset)}")
+#     print(f"Validation samples: {len(val_dataset)}")
+#     print(f"Classes: {train_dataset.classes}")
+
+#     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
+#     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
+#     return train_loader, val_loader

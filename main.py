@@ -4,12 +4,17 @@ import yaml
 from utils import load_image, save_image, get_device
 from cnn import FeatureExtractor
 from style_transfer import run_style_transfer
+import argparse
 
+parser = argparse.ArgumentParser(description="Neural Style Transfer")
+parser.add_argument("--content", help="Path to the content image" ,required=True)
+parser.add_argument("--style", help="Path to the style image", required=True)
+args = parser.parse_args()
+CONTENT_IMAGE_PATH = args.content
+STYLE_IMAGE_PATH   = args.style
 
 with open("configs/default.yaml", "r") as f:
     config = yaml.safe_load(f)
-CONTENT_IMAGE_PATH = config["CONTENT_IMAGE_PATH"]
-STYLE_IMAGE_PATH   = config["STYLE_IMAGE_PATH"]
 OUTPUT_DIR         = config["OUTPUT_DIR"]
 CHECKPOINT_PATH     = config["CHECKPOINT_PATH"]
 IMAGE_SIZE        = config["IMAGE_SIZE"]
@@ -30,18 +35,19 @@ def main():
 
     if not os.path.exists(CONTENT_IMAGE_PATH):
         print(f"\nERROR: Content image not found at '{CONTENT_IMAGE_PATH}'")
-        print("Please put a JPEG image at that path and try again.")
+        # print("Please put a JPEG image at that path and try again.")
         return
 
     if not os.path.exists(STYLE_IMAGE_PATH):
         print(f"\nERROR: Style image not found at '{STYLE_IMAGE_PATH}'")
-        print("Please put a JPEG image at that path and try again.")
+        # print("Please put a JPEG image at that path and try again.")
         return
 
 #Load content and style images
     print(f"\nLoading images...")
     content_tensor = load_image(CONTENT_IMAGE_PATH, size=IMAGE_SIZE).to(device)
-    style_tensor   = load_image(STYLE_IMAGE_PATH,   size=IMAGE_SIZE).to(device)
+    *_, dynamic_height, dynamic_width = content_tensor.shape
+    style_tensor   = load_image(STYLE_IMAGE_PATH,   size=(dynamic_height, dynamic_width)).to(device)
     print(f"  Content image: {CONTENT_IMAGE_PATH}  →  tensor shape: {content_tensor.shape}")
     print(f"  Style image:   {STYLE_IMAGE_PATH}  →  tensor shape: {style_tensor.shape}")
 

@@ -4,7 +4,7 @@ import torch
 import os
 from losses import content_loss, style_loss, total_loss
 from utils import save_image
-
+import cv2
 
 def run_style_transfer(
     model,
@@ -39,7 +39,7 @@ def run_style_transfer(
     print(f"Style layers: {style_layers}")
     print("-" * 50)
 
-    step_counter = [0]
+    latest_losses = {"content": None, "style": None, "total": None}
 
     def closure():
     
@@ -63,27 +63,36 @@ def run_style_transfer(
         loss = total_loss(c_loss, s_loss, alpha, beta)
         loss.backward()
 
-        step_counter[0] += 1
-        step = step_counter[0]
-
-        if step % 50 == 0 or step == 1:
-            print(f"  Step {step:4d}/{num_steps} | "
-                  f"Loss: {loss.item():.4f} | "
-                  f"Content: {c_loss.item():.4f} | "
-                  f"Style: {s_loss.item():.6f}")
-            
-        if step % save_every == 0:
-            _save_intermediate(generated, output_dir, step)
+        latest_losses["content"] = c_loss.item()
+        latest_losses["style"] = s_loss.item()
+        latest_losses["total"] = loss.item()
         return loss
     
-    for _ in range(num_steps):
+    for step in range(1, num_steps + 1):
         optimizer.step(closure)
+
+        # if step % 50 == 0 or step == 1 or step == num_steps:
+        print(f"  Step {step:4d}/{num_steps} | "
+                f"Loss: {latest_losses['total']:.4f} | "
+                f"Content: {latest_losses['content']:.4f} | "
+                f"Style: {latest_losses['style']:.6f}")
+
+        # if step % save_every == 0 or step == 1:
+        _save_intermediate(generated, output_dir, step)
+        save_image(generated, os.path.join(output_dir, "latest.jpg"))
+        img_to_show = cv2.imread(os.path.join(output_dir, "latest.jpg"))
+        cv2.imshow("Live AI Output", img_to_show)
+        cv2.waitKey(200)
 
     print("-" * 50)
     print("Optimization complete!")
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
     return generated.detach()
 
 def _save_intermediate(generated, output_dir, step):
     os.makedirs(output_dir, exist_ok=True)
-    path = os.path.join(output_dir, f"step_{step:04d}.jpg")
+    path = os.path.join(output_dir, f"step_{step:03d}.jpg")
     save_image(generated.detach(), path)

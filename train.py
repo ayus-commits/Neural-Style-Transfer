@@ -5,7 +5,7 @@ import torch.nn as nn
 import os
 
 from cnn import Classifier
-from dataset import get_dataloaders
+from dataset import get_dataloaders_stl10
 from utils import get_device
 
 import yaml
@@ -83,7 +83,7 @@ def main():
     device = get_device()
     print(f"Using device: {device}\n")
     print("Loading STL-10 dataset (downloads ~2.5 GB on first run)...")
-    train_loader, val_loader = get_dataloaders(
+    train_loader, val_loader = get_dataloaders_stl10(
         data_dir    = "./data",
         batch_size  = BATCH_SIZE,
         num_workers = 2
