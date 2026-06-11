@@ -5,6 +5,7 @@ import os
 from losses import content_loss, style_loss, total_loss
 from utils import save_image
 import cv2
+from tqdm import tqdm
 
 def run_style_transfer(
     model,
@@ -67,13 +68,18 @@ def run_style_transfer(
         latest_losses["total"] = loss.item()
         return loss
     
-    for step in range(1, num_steps + 1):
+    pbar = tqdm(range(1, num_steps + 1), desc="Stylizing Image", unit="step")
+
+    for step in pbar:
         optimizer.step(closure)
 
-        print(f"  Step {step:4d}/{num_steps} | "
-                f"Loss: {latest_losses['total']:.4f} | "
-                f"Content: {latest_losses['content']:.4f} | "
-                f"Style: {latest_losses['style']:.6f}")
+        pbar.set_postfix(
+            {
+                "Loss": f"{latest_losses['total']:.2f}",
+                "Content": f"{latest_losses['content']:.2f}",
+                "Style": f"{latest_losses['style']:.4f}",
+            }
+        )
 
         _save_intermediate(generated, output_dir, step)
         save_image(generated, os.path.join(output_dir, "latest.jpg"))

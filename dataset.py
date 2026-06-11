@@ -2,7 +2,8 @@
 
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
-
+from torchvision.transforms import v2
+import torch
 import yaml
 
 with open("configs/default.yaml", "r") as f:
@@ -11,10 +12,8 @@ MEAN = config["MEAN"]
 STD = config["STD"]
 
 train_transform_stl10 = transforms.Compose([
-    transforms.RandomCrop(88),
     transforms.Resize(96),
     transforms.RandomHorizontalFlip(p=0.5),
-    transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.2),
     transforms.ToTensor(),
     transforms.Normalize(mean=MEAN, std=STD),
 ])
@@ -32,21 +31,22 @@ def get_dataloaders_stl10(data_dir="./data", batch_size=64, num_workers=2):
     print(f"Validation samples: {len(val_dataset)}")
     print(f"Classes: {train_dataset.classes}")
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=torch.cuda.is_available())
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=torch.cuda.is_available())
     return train_loader, val_loader
 
 
 
 
 train_transform_imagenette = transforms.Compose([
-    transforms.Resize((224, 224)),
+    transforms.RandomResizedCrop(224, scale=(0.7, 1.0)),
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.ToTensor(),
     transforms.Normalize(mean=MEAN, std=STD),
 ])
 val_transform_imagenette = transforms.Compose([
-    transforms.Resize((224, 224)),
+    transforms.Resize(224),
+    transforms.CenterCrop(224),
     transforms.ToTensor(),
     transforms.Normalize(mean=MEAN, std=STD),
 ])
@@ -59,6 +59,6 @@ def get_dataloaders_imagenette(data_dir="./data", batch_size=64, num_workers=2):
     print(f"Validation samples: {len(val_dataset)}")
     print(f"Classes: {train_dataset.classes}")
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=torch.cuda.is_available())
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=torch.cuda.is_available())
     return train_loader, val_loader

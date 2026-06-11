@@ -15,7 +15,7 @@ import yaml
 
 parser = argparse.ArgumentParser(description="Neural Style Transfer")
 # parser.add_argument("--data-dir", help="Path to the STL-10 dataset", default="./data")
-parser.add_argument("--data", help="Dataset to use", required=True)
+parser.add_argument("--data", help="Dataset to use", default="imagenette")
 # parser.add_argument("--config", help="Which config file to use", default="default")
 args = parser.parse_args()
 DATASET = args.data
@@ -28,13 +28,15 @@ NUM_EPOCHS     = config["NUM_EPOCHS"]
 LEARNING_RATE  = config["LEARNING_RATE"]
 
 
-def train_one_epoch(model, loader, optimizer, loss_fn, device):
+def train_one_epoch(model, loader, optimizer, loss_fn, device ,epoch_idx):
     model.train()
     total_loss    = 0
     correct       = 0
     total_samples = 0
 
-    for images, labels in loader:
+    pbar = tqdm(loader, desc=f"Epoch {epoch_idx:02d} [Train]", leave=False, unit="batch")
+
+    for images, labels in pbar:
         images, labels = images.to(device), labels.to(device)
 
         optimizer.zero_grad()
@@ -47,20 +49,24 @@ def train_one_epoch(model, loader, optimizer, loss_fn, device):
         _, predicted = torch.max(outputs, 1)
         correct += (predicted == labels).sum().item()
         total_samples += labels.size(0)
+
+        pbar.set_postfix({"batch_loss": f"{loss.item():.4f}"})
     
     avg_loss = total_loss / total_samples
     accuracy = correct / total_samples
     return avg_loss, accuracy
 
 
-def validate(model, loader, loss_fn, device):
+def validate(model, loader, loss_fn, device, epoch_idx):
     model.eval()
     total_loss    = 0
     correct       = 0
     total_samples = 0
 
+    pbar = tqdm(loader, desc=f"Epoch {epoch_idx:02d} [Val]  ", leave=False, unit="batch")
+
     with torch.no_grad():
-        for images, labels in loader:
+        for images, labels in pbar:
             images, labels = images.to(device), labels.to(device)
 
             outputs = model(images)
@@ -97,7 +103,7 @@ def main():
         train_loader, val_loader = get_dataloaders_stl10(
             data_dir    = "./data",
             batch_size  = BATCH_SIZE,
-            num_workers = 2
+            num_workers = 0
         )
         CHECKPOINT_PATH = "./checkpoints/stl10_backbone.pth"
     elif DATASET.lower() == "imagenette":
@@ -105,7 +111,7 @@ def main():
         train_loader, val_loader = get_dataloaders_imagenette(
             data_dir    = "./data",
             batch_size  = BATCH_SIZE,
-            num_workers = 2
+            num_workers = 0
         )
         CHECKPOINT_PATH = "./checkpoints/imagenette_backbone.pth"
     model = Classifier(num_classes=10).to(device)
@@ -128,11 +134,11 @@ def main():
     for epoch in range(1, NUM_EPOCHS + 1):
 
         train_loss, train_acc = train_one_epoch(
-            model, train_loader, optimizer, loss_fn, device
+            model, train_loader, optimizer, loss_fn, device , epoch
         )
 
         val_loss, val_acc = validate(
-            model, val_loader, loss_fn, device
+            model, val_loader, loss_fn, device , epoch
         )
 
         scheduler.step()
