@@ -2,6 +2,7 @@
 IMAGE_SIZE     : 256
 ALPHA : 100.0
 BETA  : 10000000000.0
+GAMMA : 0.001
 NUM_STEPS  : 30
 CONTENT_LAYER : "stage4"
 STYLE_LAYERS : ["stage1", "stage2", "stage3", "stage4"]

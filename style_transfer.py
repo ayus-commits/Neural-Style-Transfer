@@ -2,7 +2,7 @@
 
 import torch
 import os
-from losses import content_loss, style_loss, total_loss
+from losses import content_loss, style_loss, total_variation_loss, total_loss
 from utils import save_image
 import cv2
 from tqdm import tqdm
@@ -13,6 +13,7 @@ def run_style_transfer(
     style_tensor,
     alpha,
     beta,
+    gamma,
     num_steps,
     output_dir,
     device,
@@ -39,7 +40,7 @@ def run_style_transfer(
     print(f"Style layers: {style_layers}")
     print("-" * 50)
 
-    latest_losses = {"content": None, "style": None, "total": None}
+    latest_losses = {"content": None, "style": None, "variation": None, "total": None}
 
     def closure():
     
@@ -60,11 +61,13 @@ def run_style_transfer(
                 style_targets[layer]
             )
 
-        loss = total_loss(c_loss, s_loss, alpha, beta)
+        v_loss = total_variation_loss(generated)
+        loss = total_loss(c_loss, s_loss, v_loss, alpha, beta, gamma)
         loss.backward()
 
         latest_losses["content"] = c_loss.item()
         latest_losses["style"] = s_loss.item()
+        latest_losses["variation"] = v_loss.item()
         latest_losses["total"] = loss.item()
         return loss
     
@@ -77,6 +80,7 @@ def run_style_transfer(
             {
                 "Loss": f"{latest_losses['total']:.2f}",
                 "Content": f"{latest_losses['content']:.2f}",
+                "Variation": f"{latest_losses['variation']:.2f}",
                 "Style": f"{latest_losses['style']:.4f}",
             }
         )

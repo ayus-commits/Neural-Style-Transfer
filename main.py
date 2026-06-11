@@ -26,6 +26,7 @@ with open("configs/" + args.config + ".yaml", "r") as f:
 IMAGE_SIZE        = config["IMAGE_SIZE"]
 ALPHA             = config["ALPHA"]
 BETA              = config['BETA']
+GAMMA             = config['GAMMA']
 NUM_STEPS         = config["NUM_STEPS"]
 CONTENT_LAYER     = config["CONTENT_LAYER"]
 STYLE_LAYERS      = config["STYLE_LAYERS"]
@@ -76,6 +77,7 @@ def main():
     print(f"  Image size:     {IMAGE_SIZE}px")
     print(f"  Alpha (content): {ALPHA}")
     print(f"  Beta  (style):   {BETA:.0e}")
+    print(f"  Gamma (variation): {GAMMA:.0e}")
     print(f"  Steps:           {NUM_STEPS}")
     print(f"  Content layer:   {CONTENT_LAYER}")
     print(f"  Style layers:    {STYLE_LAYERS}")
@@ -90,6 +92,7 @@ def main():
         style_tensor   = style_tensor,
         alpha          = ALPHA,
         beta           = BETA,
+        gamma          = GAMMA,
         num_steps      = NUM_STEPS,
         output_dir     = OUTPUT_DIR,
         device         = device,

@@ -21,5 +21,11 @@ def style_loss(generated_features, style_features):
     return F.mse_loss(gram_generated, gram_style)
 
 
-def total_loss(content_loss_val, style_loss_val, alpha, beta):
-    return alpha * content_loss_val + beta * style_loss_val
+def total_variation_loss(image):
+    x_diff = image[:, :, :, :-1] - image[:, :, :, 1:]
+    y_diff = image[:, :, :-1, :] - image[:, :, 1:, :]
+    return torch.sum(torch.abs(x_diff)) + torch.sum(torch.abs(y_diff))
+
+
+def total_loss(content_loss_val, style_loss_val, total_variation_loss_val, alpha, beta, gamma):
+    return alpha * content_loss_val + beta * style_loss_val  + gamma * total_variation_loss_val
