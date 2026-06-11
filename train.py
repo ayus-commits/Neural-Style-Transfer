@@ -16,6 +16,7 @@ import yaml
 parser = argparse.ArgumentParser(description="Neural Style Transfer")
 # parser.add_argument("--data-dir", help="Path to the STL-10 dataset", default="./data")
 parser.add_argument("--data", help="Dataset to use", default="imagenette")
+parser.add_argument("--checkpoint", help="Checkpoint file name(if you want to continue training)", default=None)
 # parser.add_argument("--config", help="Which config file to use", default="default")
 args = parser.parse_args()
 DATASET = args.data
@@ -115,6 +116,12 @@ def main():
         )
         CHECKPOINT_PATH = "./checkpoints/imagenette_backbone.pth"
     model = Classifier(num_classes=10).to(device)
+
+    if args.checkpoint:
+        CHECKPOINT_PATH = "./checkpoints/" + args.checkpoint
+        state_dict = torch.load(CHECKPOINT_PATH, map_location=device)
+        model.backbone.load_state_dict(state_dict)
+        print(f"Loaded backbone weights from: {args.checkpoint}")
 
     total_params = sum(p.numel() for p in model.parameters())
     print(f"\nModel parameters: {total_params:,}")

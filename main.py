@@ -13,7 +13,7 @@ parser.add_argument("--name", help="Name for the output image folder", required=
 
 parser.add_argument("--config", help="Which config file to use", default="default")
 parser.add_argument("--output-dir", help="Directory to save outputs", default="./outputs")
-parser.add_argument("--checkpoint", help="Checkpoint to use(stl10 or imagenette)", default="imagenette")
+parser.add_argument("--checkpoint", help="Checkpoint to use", default="imagenette")
 args = parser.parse_args()
 CONTENT_IMAGE_PATH = args.content
 STYLE_IMAGE_PATH   = args.style

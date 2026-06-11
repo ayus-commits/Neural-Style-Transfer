@@ -24,7 +24,7 @@ feature extractor in ~50 lines. This project:
 - Designs a custom CNN (`StyleNet`) from scratch with principled architectural choices.
 - Implements Gram matrix computation with full mathematical derivation.
 - Uses LBFGS pixel-space optimization (not image-space Adam).
-- Pre-trains the CNN backbone on CIFAR-10 for semantically meaningful features.
+- Pre-trains the CNN backbone on imagenette for semantically meaningful features.
 - Includes a complete test suite with mathematical invariance checks.
 - Ships a Gradio web demo and CLI in a Dockerized package.
 
@@ -34,14 +34,14 @@ feature extractor in ~50 lines. This project:
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/your-username/neural-style-transfer
+git clone https://github.com/ayus-commits/neural-style-transfer
 cd neural-style-transfer
 pip install -r requirements.txt
 
 # 2. Run style transfer
 python main.py \
-    --content data/content_examples/city.jpg \
-    --style   data/style_examples/vangogh.jpg \
+    --content data/content_examples/content.jpg \
+    --style   data/style_examples/style.jpg \
     --config  configs/default.yaml \
     --name    my_first_run
 

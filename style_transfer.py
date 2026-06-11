@@ -84,7 +84,16 @@ def run_style_transfer(
         _save_intermediate(generated, output_dir, step)
         save_image(generated, os.path.join(output_dir, "latest.jpg"))
         img_to_show = cv2.imread(os.path.join(output_dir, "latest.jpg"))
-        cv2.imshow("Live Output", img_to_show)
+        cv2.putText(
+            img_to_show,
+            f"Step {step}/{num_steps}  Loss={latest_losses['total']:.4f}",
+            (5, 20),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (255,255,255),
+            1
+        )
+        cv2.imshow(f"Live Output", img_to_show)
         cv2.waitKey(200)
 
     print("-" * 50)

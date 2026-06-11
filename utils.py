@@ -15,7 +15,19 @@ def load_image(path, size=None):
     img = Image.open(path).convert("RGB")
     steps = []
     if size is not None:
-        steps.append(transforms.Resize(size))
+        if isinstance(size, tuple):
+            target_h, target_w = size
+            scale = max(
+                target_h / img.height,
+                target_w / img.width
+            )
+            new_h = int(img.height * scale)
+            new_w = int(img.width * scale)
+
+            steps.append(transforms.Resize((new_h, new_w)))
+            steps.append(transforms.CenterCrop((target_h, target_w)))
+        else:
+            steps.append(transforms.Resize(size))
     steps.append(transforms.ToTensor())
     steps.append(transforms.Normalize(mean=MEAN, std=STD))
     transform = transforms.Compose(steps)
@@ -30,7 +42,7 @@ def save_image(tensor, path):
     to_pil = transforms.ToPILImage()
     img = to_pil(tensor)
     img.save(path)
-    print(f"Saved image to: {path}")
+    # print(f"Saved image to: {path}")
 
 def get_device():
     if torch.cuda.is_available():
