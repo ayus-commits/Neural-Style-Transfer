@@ -4,7 +4,7 @@ import torch
 import os
 from losses import content_loss, style_loss, total_variation_loss, total_loss
 from utils import save_image
-import cv2
+# import cv2
 from tqdm import tqdm
 
 def run_style_transfer(
@@ -84,27 +84,29 @@ def run_style_transfer(
                 "Style": f"{latest_losses['style']:.4f}",
             }
         )
+        with open(os.path.join(output_dir, "progress.txt"),"w") as f:
+            f.write(f"{step},{num_steps},{latest_losses['total']}")
 
         _save_intermediate(generated, output_dir, step)
         save_image(generated, os.path.join(output_dir, "latest.jpg"))
-        img_to_show = cv2.imread(os.path.join(output_dir, "latest.jpg"))
-        cv2.putText(
-            img_to_show,
-            f"Step {step}/{num_steps}  Loss={latest_losses['total']:.4f}",
-            (5, 20),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
-            (255,255,255),
-            1
-        )
-        cv2.imshow(f"Live Output", img_to_show)
-        cv2.waitKey(200)
+        # img_to_show = cv2.imread(os.path.join(output_dir, "latest.jpg"))
+        # cv2.putText(
+        #     img_to_show,
+        #     f"Step {step}/{num_steps}  Loss={latest_losses['total']:.4f}",
+        #     (5, 20),
+        #     cv2.FONT_HERSHEY_SIMPLEX,
+        #     0.5,
+        #     (255,255,255),
+        #     1
+        # )
+        # cv2.imshow(f"Live Output", img_to_show)
+        # cv2.waitKey(200)
 
     print("-" * 50)
     print("Optimization complete!")
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     return generated.detach()
 

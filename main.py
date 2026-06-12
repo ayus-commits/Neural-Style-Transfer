@@ -6,30 +6,6 @@ from cnn import FeatureExtractor
 from style_transfer import run_style_transfer
 import argparse
 
-parser = argparse.ArgumentParser(description="Neural Style Transfer")
-parser.add_argument("--content", help="Path to the content image" ,required=True)
-parser.add_argument("--style", help="Path to the style image", required=True)
-parser.add_argument("--name", help="Name for the output image folder", required=True)
-
-parser.add_argument("--config", help="Which config file to use", default="default")
-parser.add_argument("--output-dir", help="Directory to save outputs", default="./outputs")
-parser.add_argument("--checkpoint", help="Checkpoint to use", default="imagenette")
-args = parser.parse_args()
-CONTENT_IMAGE_PATH = args.content
-STYLE_IMAGE_PATH   = args.style
-OUTPUT_DIR         = args.output_dir + "/" + args.name
-CHECKPOINT_PATH     = "./checkpoints/" + args.checkpoint + "_backbone.pth"
-
-
-with open("configs/" + args.config + ".yaml", "r") as f:
-    config = yaml.safe_load(f)
-IMAGE_SIZE        = config["IMAGE_SIZE"]
-ALPHA             = config["ALPHA"]
-BETA              = config['BETA']
-GAMMA             = config['GAMMA']
-NUM_STEPS         = config["NUM_STEPS"]
-CONTENT_LAYER     = config["CONTENT_LAYER"]
-STYLE_LAYERS      = config["STYLE_LAYERS"]
 
 def main():
     print("=" * 60)
@@ -110,4 +86,91 @@ def main():
 
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="Neural Style Transfer")
+    parser.add_argument("--content", help="Path to the content image" ,required=True)
+    parser.add_argument("--style", help="Path to the style image", required=True)
+    parser.add_argument("--name", help="Name for the output image folder", required=True)
+
+    parser.add_argument("--config", help="Which config file to use", default="default")
+    parser.add_argument("--output-dir", help="Directory to save outputs", default="./outputs")
+    parser.add_argument("--checkpoint", help="Checkpoint to use", default="imagenette")
+    args = parser.parse_args()
+    CONTENT_IMAGE_PATH = args.content
+    STYLE_IMAGE_PATH   = args.style
+    OUTPUT_DIR         = args.output_dir + "/" + args.name
+    CHECKPOINT_PATH     = "./checkpoints/" + args.checkpoint + "_backbone.pth"
+
+    with open("configs/" + args.config + ".yaml", "r") as f:
+        config = yaml.safe_load(f)
+    IMAGE_SIZE        = config["IMAGE_SIZE"]
+    ALPHA             = config["ALPHA"]
+    BETA              = config['BETA']
+    GAMMA             = config['GAMMA']
+    NUM_STEPS         = config["NUM_STEPS"]
+    CONTENT_LAYER     = config["CONTENT_LAYER"]
+    STYLE_LAYERS      = config["STYLE_LAYERS"]
+
     main()
+
+
+
+#function for streamlit app to run style transfer and display results
+def generate_style_transfer(
+    content_path,
+    style_path,
+    output_name,
+    config_name="default",
+    output_dir="./outputs",
+    checkpoint="imagenette",
+    image_size=None,
+    alpha=None,
+    beta=None,
+    gamma=None,
+    num_steps=None
+):
+    global CONTENT_IMAGE_PATH
+    global STYLE_IMAGE_PATH
+    global OUTPUT_DIR
+    global CHECKPOINT_PATH
+    global IMAGE_SIZE
+    global ALPHA
+    global BETA
+    global GAMMA
+    global NUM_STEPS
+    global CONTENT_LAYER
+    global STYLE_LAYERS
+
+    if config_name != "custom":
+        with open(f"configs/{config_name}.yaml", "r") as f:
+            config = yaml.safe_load(f)
+        cfg_image_size = config["IMAGE_SIZE"]
+        cfg_alpha = config["ALPHA"]
+        cfg_beta = config["BETA"]
+        cfg_gamma = config["GAMMA"]
+        cfg_num_steps = config["NUM_STEPS"]
+        cfg_content_layer = config["CONTENT_LAYER"]
+        cfg_style_layers = config["STYLE_LAYERS"]
+    else:
+        cfg_image_size = image_size
+        cfg_alpha = alpha
+        cfg_beta = beta
+        cfg_gamma = gamma
+        cfg_num_steps = num_steps
+        cfg_content_layer = "stage4"
+        cfg_style_layers = ["stage1", "stage2", "stage3"]
+    OUTPUT_DIR = os.path.join(output_dir, output_name)
+    CHECKPOINT_PATH = f"./checkpoints/{checkpoint}_backbone.pth"
+    CONTENT_IMAGE_PATH = content_path
+    STYLE_IMAGE_PATH = style_path
+    IMAGE_SIZE = cfg_image_size
+    ALPHA = cfg_alpha
+    BETA = cfg_beta
+    GAMMA = cfg_gamma
+    NUM_STEPS = cfg_num_steps
+    CONTENT_LAYER = cfg_content_layer
+    STYLE_LAYERS = cfg_style_layers
+
+    main()
+    final_path = os.path.join(OUTPUT_DIR, "final_output.jpg")
+    return final_path
