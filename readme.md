@@ -1,12 +1,12 @@
 # 🎨 Neural Style Transfer — From Scratch
 
-<!-- <div align="center"> -->
+<div align="center">
 
 **Transfer the artistic style of any painting onto your photos — powered by a CNN built entirely from scratch.**
 
-[Overview](#-overview) · [Architecture](#-architecture) · [Loss Functions](#-loss-functions) · [Installation](#-installation) · [Usage](#-usage) · [Experiments](#-experiments) · [Results](#-results)
+[Overview](#-overview) · [Architecture](#%EF%B8%8F-architecture) · [Loss Functions](#-loss-functions) · [Installation](#%EF%B8%8F-installation) · [Usage](#-usage) · [Experiments](#-experiments) · [Results](#%EF%B8%8F-results)
 
-<!-- </div> -->
+</div>
 
 ---
 
