@@ -1,6 +1,11 @@
 import streamlit as st
 import tempfile
 import os
+from PIL import Image
+import threading
+import time
+# from datetime import datetime
+from main import generate_style_transfer
 
 st.set_page_config(
     page_title="Neural Style Transfer",
@@ -25,7 +30,7 @@ style_file = st.file_uploader("Style Image", type=["jpg", "jpeg", "png"])
 
 with st.sidebar:
 
-    config_name = st.selectbox("Config",["default", "default_512", "custom", "exp1", "exp2"])
+    config_name = st.selectbox("Config",["default", "default_512", "custom", "exp1", "exp2","exp3","exp4","exp5","exp6","exp7"],index=0)
     if config_name == "custom":
         with st.expander("Custom Hyperparameters",expanded=True):
             image_size = st.slider("Image Size",min_value=64,max_value=1024,value=256,step=64)
@@ -60,10 +65,6 @@ if content_file and style_file:
         generated_placeholder = st.empty()
 
 # Generate-------------------------------------------------------------------------
-import threading
-import time
-# from datetime import datetime
-from main import generate_style_transfer
 
 if st.button("Generate Style Transfer",disabled=st.session_state.running):
 
@@ -134,7 +135,15 @@ if st.button("Generate Style Transfer",disabled=st.session_state.running):
         latest_image = os.path.join(run_output_dir, "latest.jpg")
         if os.path.exists(latest_image):
             # image_placeholder.image(latest_image, caption="Live Output")
-            generated_placeholder.image(latest_image, caption="Live Output")
+            # generated_placeholder.image(latest_image, caption="Live Output")
+            try:
+                img = Image.open(latest_image)
+                img.load()          # force full read
+                # st.image(img, caption="Live Output")
+                generated_placeholder.image(img, caption="Live Output")
+            except Exception:
+                st.info("⏳ Updating image...")
+
         progress_file = os.path.join(run_output_dir, "progress.txt")
 
         if os.path.exists(progress_file):

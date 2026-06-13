@@ -16,6 +16,10 @@ Neural Style Transfer (NST) is the technique of blending the *content* of one im
 
 A custom convolutional neural network is first trained on image classification, and then its learned feature representations are repurposed as a perceptual feature extractor to drive the style transfer optimization loop.
 
+| Content | Style | | Output |
+|---|---|---|---|
+| <img src="images/2.jpg" style="height: 300px;"> | <img src="images/2s.jpg" style="height: 300px;"> | --> | <img src="images/outputs/22.jpg" style="height: 300px;"> |
+
 ### ✨ Key Highlights
 
 | Feature | Detail |
@@ -265,7 +269,7 @@ python -c "from utils import get_device; print(get_device())"
 
 ---
 
-## 🗂️ Dataset Preparation
+## 🗂️ Dataset Preparation (Not required ,recommended to use saved weights from checkpoint)
 
 The training datasets are downloaded automatically via `torchvision` / the dataset loader.
 
@@ -382,8 +386,11 @@ Nine configurations are provided to systematically explore the design space of N
 
 | Content | Style | Output |
 |---|---|---|
-| `[content image]` | `[style image]` | `[stylized output]` |
-| `[content image]` | `[style image]` | `[stylized output]` |
+| <img src="images/1.jpg" style="height: 200px;"> | <img src="images/5s.jpeg" style="height: 200px;"> | <img src="images/outputs/15.jpg" style="height: 200px;"> |
+| <img src="images/2.jpg" style="height: 200px;"> | <img src="images/6s.jpg" style="height: 200px;"> | <img src="images/outputs/26.jpg" style="height: 200px;"> |
+| <img src="images/2.jpg" style="height: 200px;"> | <img src="images/7s.jpg" style="height: 200px;"> | <img src="images/outputs/27.jpg" style="height: 200px;"> |
+| <img src="images/2.jpg" style="height: 200px;"> | <img src="images/8s.jpg" style="height: 200px;"> | <img src="images/outputs/28.jpg" style="height: 200px;"> |
+| <img src="images/3.jpg" style="height: 200px;"> | <img src="images/10s.jpg" style="height: 200px;"> | <img src="images/outputs/310.jpg" style="height: 200px;"> |
 
 **Typical optimization progression (intermediate frames):**
 

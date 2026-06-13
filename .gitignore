@@ -1,6 +1,6 @@
-data/
-output/
-outputs/
+/data/
+/output/
+/outputs/
 __pycache__/
 .vscode/
 .DS_Store
