@@ -146,10 +146,13 @@ neural-style-transfer/
 ├── train.py                # Classification training pipeline
 ├── style_transfer.py       # Core NST optimization loop
 ├── losses.py               # Content, style, TV, and total loss functions
-├── dataset.py              # STL-10 and Imagenette dataset loaders
-├── utils.py                # Image I/O, normalization, device detection
-├── main.py                 # CLI entry point
-├── app.py                  # Streamlit web application
+├── dataset.py               # STL-10 and Imagenette dataset loaders
+├── utils.py                 # Image I/O, normalization, device detection
+├── main.py                  # CLI entry point
+├── app.py                   # Streamlit web application (UI only)
+├── job_manager.py            # Process-isolated job orchestration (locking, timeout, cleanup)
+├── worker.py                 # Subprocess entry point that runs NST in isolation
+├── image_utils.py            # Upload validation & sanitization (size, format, decompression bombs)
 │
 ├── configs/
 │   ├── default.yaml        # 256px baseline configuration
@@ -163,9 +166,12 @@ neural-style-transfer/
 │   └── exp7.yaml           # Experiment 7
 │
 └── checkpoints/
-    ├── imagenette_backbone.pth         # Primary trained weights (on imagenette dataset)
-    ├── backup_imagenette_backbone.pth  # Backup weights
-    └── stl10_backbone.pth              # Weights trained on stl10 dataset
+│   ├── imagenette_backbone.pth         # Primary trained weights (on imagenette dataset)
+│   ├── backup_imagenette_backbone.pth  # Backup weights
+│   └── stl10_backbone.pth              # Weights trained on stl10 dataset
+│
+├── temp/                     # Auto-created at runtime: uploads/ and jobs/ (gitignored)
+└── logs/                     # Auto-created at runtime: rotating app.log (gitignored)
 
 ```
 
@@ -320,12 +326,27 @@ Then open [http://localhost:8501](http://localhost:8501) in your browser.
 
 #### App Features
 
-- 📤 Upload content and style images via drag-and-drop
+- 📤 Upload content and style images via drag-and-drop (validated: jpg/jpeg/png only, max 10 MB, max 4096×4096)
 - 🎛️ Select experiment configuration from a dropdown
-- 🔧 Override hyperparameters ($\alpha$, $\beta$, $\gamma$, steps) with live sliders
-- 📈 Real-time loss curve visualization
-- 🖼️ Intermediate image preview during optimization
+- 🔧 Override hyperparameters (α, β, γ, steps) with live sliders, clamped server-side
+- 🖼️ Live intermediate image preview during optimization
+- 📊 Step counter and loss display, updated in real time
+- 🛑 Cancel button to terminate a running job mid-optimization
+- ⏱️ Automatic 15-minute timeout — runaway jobs are killed automatically
+- 🔒 Single-job concurrency — only one style transfer runs at a time, server-wide
 - 💾 Download the final stylized image
+
+
+#### Reliability & Safety
+
+Style transfer runs in a fully isolated subprocess, not inside the Streamlit
+process. This means a CUDA out-of-memory error, a crash in the NST code, or a
+malformed upload can never take down the web app itself — failures are caught,
+logged to `logs/app.log`, and shown as a friendly error message in the UI.
+
+> Note: output paths are now managed automatically per job (`temp/jobs/<job_id>/`);
+> there's no manual output directory field in the web UI. The CLI (Method 2) is
+> unaffected and still accepts `--output-dir` / `--name`.
 
 ---
 
